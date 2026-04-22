@@ -37,7 +37,7 @@ def main():
             password = input("Enter password: ")
 
             if username not in users:
-                print("User not found")
+                print(" User not found ")
                 continue
 
             user = users[username]
@@ -57,7 +57,8 @@ def main():
                 print("2. Withdraw")
                 print("3. Check Balance")
                 print("4. View History")
-                print("5. Logout")
+                print("5  Transfer Money")
+                print("6. Logout")
 
                 action = input("Choose option: ")
 
@@ -78,8 +79,42 @@ def main():
                     user.show_history()
 
                 elif action == "5":
-                    print("Logged out")
-                    break
+                    reciver_name=input("Enter recipient username:  ")
+
+                    if reciver_name not in users:
+                        print("User not found ")
+                        continue
+
+                    if reciver_name == user.username:
+                        print("you can not  transfare to your self ")
+                        continue
+
+                    reciver=users[reciver_name ]
+                    try :
+
+                      amount=float(input("Enter amount to transfare:  " ))
+                    except ValueError:
+                      
+                      print("Invalid amount (enter a number)")
+
+                    if amount <=0 :
+                        print("Invalid amount  ")
+                    elif amount > user.balance :
+                        print("Insuficient balance")
+                    else:
+                        user.balance-=amount
+                        reciver.balance+= amount 
+
+                        user.history.append(f"sent {amount} to {reciver_name}")
+                        reciver.history.append(f"recived {amount} from {user.username}")
+                        
+                        save_users(users) 
+                        print("Transfer successful")
+                       
+
+  
+                    
+                        
 
                 else:
                     print(" Invalid choice (enter 1-5) ")

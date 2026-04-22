@@ -1,78 +1,5 @@
-import json
-
-class User:
-    def __init__(self, username, password , balance=0, history=None):
-        self.username = username
-        self.password=password
-        self.balance = balance
-        self.history = history if history else []
-
-    def deposit(self, amount):
-        if amount <= 0:
-            print("Invalid amount")
-            return
-        self.balance += amount
-        self.history.append(f"Deposited {amount}")
-        print("Deposit successful ")
-
-    def withdraw(self, amount):
-        if amount <= 0:
-            print("Invalid amount")
-        elif amount > self.balance:
-            print("Insufficient amount ")
-        else:
-            self.balance -= amount
-            self.history.append(f"Withdrew {amount}")
-            print("Withdraw successful ")
-
-    def check_balance(self):
-        print(f"Current balance: {self.balance}")
-
-    def show_history(self):
-        if not self.history:
-            print("No transactions yet")
-        else:
-            print("\nTransaction History:")
-            for h in self.history:
-                print("-", h)
-
-
-# ---------------- FILE HANDLING ----------------
-
-def save_users(users):
-    data={}
-
-    for username,user in users.items():
-        data[username]={
-            "password": user.password,
-            "balance": user.balance,
-            "history": user.history
-        }
-
-    with open("bank.json", "w") as file:
-        json.dump(data,file,indent=4)
-
-def load_users():
-    users = {}
-    try:
-        with open("bank.json", "r") as file:
-            data=json.load(file) 
-
-            for username , info in data.items():
-                users[username] = User(
-
-                    username,
-
-                    info["password"],
-                    info["balance"],
-                    info["history"]
-                )
-                
-
-    except FileNotFoundError:
-        pass
-
-    return users
+from user import User, hash_password
+from file_handler import save_users, load_users
 
 
 # ---------------- MAIN SYSTEM ----------------
@@ -88,43 +15,43 @@ def main():
 
         choice = input("Choose option: ")
 
-      
+        # ---------------- REGISTER PART ----------------
         if choice == "1":
-               username = input("Enter username: ")
-               password = input("Enter password: ")
+            username = input("Enter username: ")
+            password = input("Enter password: ")
 
-               if username in users:
-                 print("Username already exists")
+            if username in users:
+                print("Username already exists")
 
-               elif len(password) < 4:
-                 print("Password must be at least 4 characters")
-    
-               else:
-                 users[username] = User(username, password)
-                 save_users(users)
-                 print("Account created successfully")
+            elif len(password) < 4:
+                print("Password must be at least 4 characters")
 
+            else:
+                users[username] = User(username, password)
+                save_users(users)
+                print("Account created successfully")
 
-
-       
+        # ---------------- LOGIN PART ----------------
         elif choice == "2":
-             username = input("Enter username: ")
-             password = input("Enter password: ")
+            username = input("Enter username: ")
+            password = input("Enter password: ")
 
-             if username not in users:
-                 print("User not found")
-                 continue
+            if username not in users:
+                print("User not found")
+                continue
 
-             user = users[username]
+            user = users[username]
 
-             if user.password != password:
+            hashed = hash_password(password)
+
+            if user.password != hashed:
                 print("Invalid password")
                 continue
 
-             print(f"\nWelcome {user.username}")
+            print(f"\nWelcome {user.username}")
 
-          
-             while True:
+            # ---------------- USER MENU PART ----------------
+            while True:
                 print("\n--- Menu ---")
                 print("1. Deposit")
                 print("2. Withdraw")
@@ -151,21 +78,20 @@ def main():
                     user.show_history()
 
                 elif action == "5":
-                    print("Logged out ")
+                    print("Logged out")
                     break
 
                 else:
-                    print("Invalid choice (pleace enter only number 1-5 )  ")
+                    print(" Invalid choice (enter 1-5) ")
 
-
-   
+        # ---------------- EXIT PART ----------------
         elif choice == "3":
             save_users(users)
-            print("Goodbye ")
-            break
+            print("Goodbye 👋")
+            break 
 
         else:
-            print("Invalid choice (enter only number 1-3)")
+            print("Invalid choice (enter 1-3)")
 
 
 if __name__ == "__main__":

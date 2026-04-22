@@ -1,6 +1,9 @@
+import json
+
 class User:
-    def __init__(self, username, balance=0, history=None):
+    def __init__(self, username, password , balance=0, history=None):
         self.username = username
+        self.password=password
         self.balance = balance
         self.history = history if history else []
 
@@ -37,22 +40,35 @@ class User:
 # ---------------- FILE HANDLING ----------------
 
 def save_users(users):
-    with open("bank.txt", "w") as file:
-        for username, user in users.items():
-            history_str = "|".join(user.history)
-            file.write(f"{username},{user.balance},{history_str}\n")
+    data={}
+
+    for username,user in users.items():
+        data[username]={
+            "password": user.password,
+            "balance": user.balance,
+            "history": user.history
+        }
+
+    with open("bank.json", "w") as file:
+        json.dump(data,file,indent=4)
 
 def load_users():
     users = {}
     try:
-        with open("bank.txt", "r") as file:
-            for line in file:
-                parts = line.strip().split(",")
-                username = parts[0]
-                balance = float(parts[1])
-                history = parts[2].split("|") if len(parts) > 2 and parts[2] else []
+        with open("bank.json", "r") as file:
+            data=json.load(file) 
 
-                users[username] = User(username, balance, history)
+            for username , info in data.items():
+                users[username] = User(
+
+                    username,
+
+                    info["password"],
+                    info["balance"],
+                    info["history"]
+                )
+                
+
     except FileNotFoundError:
         pass
 
@@ -74,28 +90,41 @@ def main():
 
       
         if choice == "1":
-            username = input("Enter username: ")
+               username = input("Enter username: ")
+               password = input("Enter password: ")
 
-            if username in users:
-                print("Username already exists")
-            else:
-                users[username] = User(username)
-                save_users(users)
-                print("Account created successfully ")
+               if username in users:
+                 print("Username already exists")
+
+               elif len(password) < 4:
+                 print("Password must be at least 4 characters")
+    
+               else:
+                 users[username] = User(username, password)
+                 save_users(users)
+                 print("Account created successfully")
+
+
 
        
         elif choice == "2":
-            username = input("Enter username: ")
+             username = input("Enter username: ")
+             password = input("Enter password: ")
 
-            if username not in users:
-                print("User not found")
+             if username not in users:
+                 print("User not found")
+                 continue
+
+             user = users[username]
+
+             if user.password != password:
+                print("Invalid password")
                 continue
 
-            user = users[username]
-            print(f"\nWelcome {user.username} ")
+             print(f"\nWelcome {user.username}")
 
           
-            while True:
+             while True:
                 print("\n--- Menu ---")
                 print("1. Deposit")
                 print("2. Withdraw")

@@ -1,9 +1,17 @@
-from user import User, hash_password
+from user import User
 from file_handler import save_users, load_users
 
 
-# ---------------- MAIN SYSTEM ----------------
+# ---------------- INPUT HELPERS PART----------------
+def get_float_input(message):
+    while True:
+        try:
+            return float(input(message))
+        except ValueError:
+            print("Invalid input. Please enter a number.")
 
+
+# ---------------- MAIN SYSTEM  PART----------------
 def main():
     users = load_users()
 
@@ -15,7 +23,7 @@ def main():
 
         choice = input("Choose option: ")
 
-        # ---------------- REGISTER PART ----------------
+        # ---------------- REGISTER  PART----------------
         if choice == "1":
             username = input("Enter username: ")
             password = input("Enter password: ")
@@ -31,44 +39,53 @@ def main():
                 save_users(users)
                 print("Account created successfully")
 
-        # ---------------- LOGIN PART ----------------
+        # ---------------- LOGIN  PART----------------
         elif choice == "2":
             username = input("Enter username: ")
-            password = input("Enter password: ")
 
             if username not in users:
-                print(" User not found ")
+                print("User not found")
                 continue
 
             user = users[username]
 
-            hashed = hash_password(password)
+            attempts = 3
 
-            if user.password != hashed:
-                print("Invalid password")
+            while attempts > 0:
+                password = input("Enter password: ")
+                hashed = User.hash_password(password)
+
+                if user.password == hashed:
+                    print(f"\nWelcome {user.username}")
+                    break
+                else:
+                    attempts -= 1
+                    print(f"Invalid password. Attempts left: {attempts}")
+
+            if attempts == 0:
+                print("Too many failed attempts. Access denied.")
                 continue
 
-            print(f"\nWelcome {user.username}")
-
-            # ---------------- USER MENU PART ----------------
+            # ---------------- USER MENU  PART----------------
             while True:
                 print("\n--- Menu ---")
                 print("1. Deposit")
                 print("2. Withdraw")
                 print("3. Check Balance")
                 print("4. View History")
-                print("5  Transfer Money")
-                print("6. Logout")
+                print("5. Transfer Money")
+                print("6. Delte acnount ")
+                print("7. Logout")
 
                 action = input("Choose option: ")
 
                 if action == "1":
-                    amount = float(input("Enter amount: "))
+                    amount = get_float_input("Enter amount: ")
                     user.deposit(amount)
                     save_users(users)
 
                 elif action == "2":
-                    amount = float(input("Enter amount: "))
+                    amount = get_float_input("Enter amount: ")
                     user.withdraw(amount)
                     save_users(users)
 
@@ -79,54 +96,73 @@ def main():
                     user.show_history()
 
                 elif action == "5":
-                    reciver_name=input("Enter recipient username:  ")
+                    receiver_name = input("Enter recipient username: ")
 
-                    if reciver_name not in users:
-                        print("User not found ")
+                    if receiver_name not in users:
+                        print("User not found")
                         continue
 
-                    if reciver_name == user.username:
-                        print("you can not  transfare to your self ")
+                    if receiver_name == user.username:
+                        print("You cannot transfer to yourself")
                         continue
 
-                    reciver=users[reciver_name ]
-                    try :
+                    receiver = users[receiver_name]
 
-                      amount=float(input("Enter amount to transfare:  " ))
-                    except ValueError:
-                      
-                      print("Invalid amount (enter a number)")
+                    amount = get_float_input("Enter amount to transfer: ")
 
-                    if amount <=0 :
-                        print("Invalid amount  ")
-                    elif amount > user.balance :
-                        print("Insuficient balance")
+                    if amount <= 0:
+                        print("Invalid amount")
+                    elif amount > user.balance:
+                        print("Insufficient balance")
                     else:
-                        user.balance-=amount
-                        reciver.balance+= amount 
+                        user.balance -= amount
+                        receiver.balance += amount
 
-                        user.history.append(f"sent {amount} to {reciver_name}")
-                        reciver.history.append(f"recived {amount} from {user.username}")
-                        
-                        save_users(users) 
+                        user.history.append(
+                            f"[{User.get_time()}] Sent {amount} to {receiver_name}"
+                        )
+                        receiver.history.append(
+                            f"[{User.get_time()}] Received {amount} from {user.username}"
+                        )
+
+                        save_users(users)
                         print("Transfer successful")
-                       
+                elif action=="7":
+                    confirm=input("Are you sure you want to delete your acount? (yes/no)")
 
-  
-                    
-                        
+                    if confirm.lower() !="yes":
+                        print("Acount deletion canceled ")
+                        continue 
+                    password = input("Enter your password to confirm: ")
+                    hashed=user.hash_password(password)
+
+                    if user.password !=hashed:
+                        print("Incorrect password.Deletion canceled ")
+                        continue 
+
+                    del User[user.username]
+                    save_users(users)
+
+                    print("Acount deleted successfully")
+                    break 
+
+
+       
+                elif action == "7":
+                    print("Logged out")
+                    break
 
                 else:
-                    print(" Invalid choice (enter 1-5) ")
+                    print("Invalid choice")
 
-        # ---------------- EXIT PART ----------------
+        # ---------------- EXIT ----------------
         elif choice == "3":
             save_users(users)
             print("Goodbye 👋")
-            break 
+            break
 
         else:
-            print("Invalid choice (enter 1-3)")
+            print("Invalid choice")
 
 
 if __name__ == "__main__":

@@ -1,18 +1,23 @@
 import hashlib
+from datetime import datetime
 
 
 class User:
 
-    # ---------------- PASSWORD HASHING PART ----------------
+    # ---------------- PASSWORD HASHING PART----------------
     @staticmethod
     def hash_password(password):
         return hashlib.sha256(password.encode()).hexdigest()
 
-    # ---------------- INIT PART ----------------
+    # ---------------- TIME HELPER PART----------------
+    @staticmethod
+    def get_time():
+        return datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    # ---------------- INIT PART----------------
     def __init__(self, username, password, balance=0, history=None, is_hashed=False):
         self.username = username
 
-        # If password already hashed (from file load)
         if is_hashed:
             self.password = password
         else:
@@ -21,31 +26,34 @@ class User:
         self.balance = balance
         self.history = history if history else []
 
-    # ---------------- DEPOSIT PART ----------------
+    # ---------------- DEPOSIT PART----------------
     def deposit(self, amount):
         if amount <= 0:
             print("Invalid amount")
             return
+
         self.balance += amount
-        self.history.append(f"Deposited {amount}")
+        self.history.append(f"[{User.get_time()}] Deposited {amount}")
         print("Deposit successful")
 
-    # ---------------- WITHDRAW PART ----------------
+    # ---------------- WITHDRAW PART----------------
     def withdraw(self, amount):
         if amount <= 0:
             print("Invalid amount")
+
         elif amount > self.balance:
             print("Insufficient amount")
+
         else:
             self.balance -= amount
-            self.history.append(f"Withdrew {amount}")
+            self.history.append(f"[{User.get_time()}] Withdrew {amount}")
             print("Withdraw successful")
 
-    # ---------------- BALANCE PART ----------------
+    # ---------------- BALANCE PART----------------
     def check_balance(self):
         print(f"Current balance: {self.balance}")
 
-    # ---------------- HISTORY PART ----------------
+    # ---------------- HISTORY PART----------------
     def show_history(self):
         if not self.history:
             print("No transactions yet")

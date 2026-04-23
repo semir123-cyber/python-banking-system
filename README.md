@@ -1,55 +1,47 @@
-
-
 #  Python Banking System
 
-A simple command-line banking system built using Python.
-This project demonstrates core programming concepts such as Object-Oriented Programming (OOP), file handling, and user interaction.
+A command-line banking application built with Python using Object-Oriented Programming (OOP), file handling, and basic security principles.
 
-## Features
+##  Features
 
-* User Registration & Login
-* Deposit & Withdraw Money
-* Balance Checking
-* Transaction History
-* Persistent Data Storage (file-based)
+* User registration & login system
+* Password hashing 
+* Deposit & withdraw functionality
+* Transfer money between users
+* Transaction history with timestamps
+* Input validation (no crashes)
+* Login attempt limitation (security)
+* Account deletion with confirmation
+* Data persistence using JSON
 
+##  Concepts Used
 
-## Concepts Used
+* Python OOP (Classes & Objects)
+* File Handling (JSON)
+* Error Handling (try/except)
+* Data Structures (dict, list)
+* Basic Security (hashing)
 
-* Object-Oriented Programming (Classes & Methods)
-* File Handling (`read`, `write`, `with`)
-* Dictionaries & Lists
-* Loops and Conditional Logic
+##  Project Structure
 
+* `main.py` → Main application logic
+* `user.py` → User class & methods
+* `file_handler.py` → Save/load system
+* `bank.json` → Stored data
 
-
-##  How to Run
+## ▶ How to Run
 
 ```bash
 python main.py
 ```
 
-
-
 ##  Future Improvements
 
-* Add password authentication
-* Use JSON for data storage
-* Improve user interface
-* Convert to GUI or web application
+* Convert to web app (Flask)
+* Add database (SQLite/PostgreSQL)
+* Improve UI/UX
+* Add user sessions
 
+---
 
-
-##  Project Structure
-
-```text
-main.py
-README.md
-```
-
-
-
-##  Author
-
-Built as a learning project to practice Python fundamentals and system design.
-
+💡 Built as a learning project to practice backend development concepts.

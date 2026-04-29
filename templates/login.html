@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p class="flash {{ category }}">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <h2>Login</h2>
+
+    <form method="POST">
+        <input type="text" name="username" placeholder="Enter username" required>
+        <input type="password" name="password" placeholder="Enter password" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="link">
+        <a href="/register">Create account</a>
+    </div>
+
+</div>
+
+</body>
+</html>

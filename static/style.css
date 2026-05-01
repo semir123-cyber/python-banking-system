@@ -121,3 +121,16 @@ button:hover {
 .flash.success {
     color: green;
 }
+
+form {
+    margin-top: 15px;
+}
+
+a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

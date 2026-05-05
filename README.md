@@ -10,7 +10,7 @@ A full-stack banking system built using **Flask + SQLite**, designed to simulate
 
 ---
 
-## 📸 Features
+##  Features
 
 * 🔐 Secure User Registration & Login (Password Hashing)
 * 💰 Deposit & Withdraw Money
@@ -89,7 +89,7 @@ http://127.0.0.1:5000
 
 ---
 
-## 📌 Future Improvements
+##  Future Improvements
 
 * 🔐 Add JWT Authentication
 * 🧾 Export transaction history (PDF/CSV)
@@ -99,7 +99,7 @@ http://127.0.0.1:5000
 
 ---
 
-## 👨‍💻 Author
+## 👨 Author
 
 Built by **Samir Gebi Roba**
 Aspiring Software Engineer focused on Python, Backend Systems, and AI.

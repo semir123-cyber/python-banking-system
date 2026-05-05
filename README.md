@@ -26,7 +26,7 @@ A full-stack banking system built using **Flask + SQLite**, designed to simulate
 
 This system follows a real backend flow:
 
-
+```
 Frontend (HTML/CSS)
         ↓
 Flask (Routes & Logic)
@@ -34,7 +34,7 @@ Flask (Routes & Logic)
 SQLite Database
         ↓
 Response back to UI
-
+```
 
 ### Key Concepts:
 
@@ -54,9 +54,9 @@ Response back to UI
 
 
 
-##  How to Run Locally
+## ▶ How to Run Locally
 
-*do this in  your terminal :
+```bash
 # Clone the repo
 git clone https://github.com/semir123-cyber/python-banking-system.git
 
@@ -71,15 +71,15 @@ python db.py
 
 # Run the app
 python app.py
-
+```
 
 Then open:
 
-
+```
 http://127.0.0.1:5000
+```
 
-
-
+---
 
 ## 🔒 Security Features
 
@@ -99,7 +99,7 @@ http://127.0.0.1:5000
 
 ---
 
-## 👨 Author
+## 👨‍💻 Author
 
 Built by **Samir Gebi Roba**
 Aspiring Software Engineer focused on Python, Backend Systems, and AI.

@@ -1,6 +1,15 @@
 from flask import Flask, render_template, request , redirect , session , flash
-from user import User
-from file_handler import load_users, save_users
+
+from db_operations import (
+    create_user,
+    login_user,
+    get_balance,
+    deposit_money,
+    withdraw_money,
+    transfer_money, 
+    get_transactions
+
+)
 
 app = Flask(__name__)
 app.secret_key= "secret123"
@@ -15,19 +24,14 @@ def home():
 # ---------------- REGISTER PART----------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    users = load_users()
-
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
 
-        if username in users:
-            return "Username already exists"
+        create_user(username, password)
+        flash("User registered successfully!", "success")
 
-        users[username] = User(username, password)
-        save_users(users)
-
-        return "Account created successfully!"
+        return redirect("/login")
 
     return render_template("register.html")
 
@@ -35,24 +39,18 @@ def register():
 # ---------------- LOGIN PART----------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    users = load_users()
-
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        username = request.form.get("username")
+        password = request.form.get("password")
 
-        if username not in users:
-            return "User not found"
+        user = login_user(username, password)
 
-        user = users[username]
-        hashed = User.hash_password(password)
-
-        if user.password != hashed:
-            flash("Invalid password", "error")
-            return redirect("/login")
-
-        session["user"] = user.username
-        return redirect("/dashboard")
+        if user:
+            session["user"] = username
+            flash("Login successful!", "success")
+            return redirect("/dashboard")
+        else:
+            flash("Invalid username or password!", "error")
 
     return render_template("login.html")
 
@@ -63,93 +61,80 @@ def dashboard():
         return redirect("/login")
 
     username = session["user"]
-    users = load_users()
-    user = users[username]
+    balance = get_balance(username)
+    transactions = get_transactions(username)
 
-    return render_template("dashboard.html", user=user)
-
-@app.route("/logout")
-def logout():
-    session.pop("user", None)
-    return redirect("/login")
-
+    return render_template(
+        "dashboard.html",
+        username=username,
+        balance=balance,
+        transactions=transactions
+    )
+# ---------------- DEPOSIT PART----------------
 @app.route("/deposit", methods=["POST"])
 def deposit():
     if "user" not in session:
         return redirect("/login")
 
-    users = load_users()
-    username = session["user"]
-    user = users[username]
-
     amount = float(request.form["amount"])
+    username = session["user"]
 
     if amount <= 0:
-       flash("Invalid amount", "error")
+        flash("Invalid amount", "error")
     else:
-        user.deposit(amount)
+        deposit_money(username, amount)
         flash("Deposit successful", "success")
-    save_users(users)
 
     return redirect("/dashboard")
 
+# ---------------- WITHDRAW PART----------------
 @app.route("/withdraw", methods=["POST"])
 def withdraw():
     if "user" not in session:
         return redirect("/login")
 
-    users = load_users()
-    username = session["user"]
-    user = users[username]
-
     amount = float(request.form["amount"])
+    username = session["user"]
 
-    user.withdraw(amount)
-    save_users(users)
+    success = withdraw_money(username, amount)
+
+    if success:
+        flash("Withdraw successful", "success")
+    else:
+        flash("Insufficient balance", "error")
 
     return redirect("/dashboard")
 
+# ---------------- TRANSFER PART----------------
 @app.route("/transfer", methods=["POST"])
 def transfer():
     if "user" not in session:
         return redirect("/login")
 
-    users = load_users()
-    sender_name = session["user"]
-    sender = users[sender_name]
-
-    receiver_name = request.form["receiver"]
+    sender = session["user"]
+    receiver = request.form["receiver"]
     amount = float(request.form["amount"])
 
-    # checks validation 
-    if receiver_name not in users:
-        return "User not found"
+    result = transfer_money(sender, receiver, amount)
 
-    if receiver_name == sender_name:
-        return "You cannot transfer to yourself"
-
-    receiver = users[receiver_name]
-
-    if amount <= 0:
-        return "Invalid amount"
-
-    if amount > sender.balance:
-        return "Insufficient balance"
-
-    #  transfer part 
-    sender.balance -= amount
-    receiver.balance += amount
-
-    sender.history.append(
-        f"[{User.get_time()}] Sent {amount} to {receiver_name}"
-    )
-    receiver.history.append(
-        f"[{User.get_time()}] Received {amount} from {sender_name}"
-    )
-
-    save_users(users)
+    if result == "success":
+        flash("Transfer successful!", "success")
+    elif result == "receiver_not_found":
+        flash("Receiver not found!", "error")
+    elif result == "same_user":
+        flash("You cannot transfer to yourself!", "error")
+    elif result == "invalid_amount":
+        flash("Invalid amount!", "error")
+    elif result == "insufficient":
+        flash("Insufficient balance!", "error")
 
     return redirect("/dashboard")
+
+# ---------------- LOGOUT PART----------------
+@app.route("/logout")
+def logout():
+    session.pop("user", None)
+    return redirect("/login")
 
                                                         
 if __name__ == "__main__":

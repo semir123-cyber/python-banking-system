@@ -1,98 +1,91 @@
 <!DOCTYPE html>
+
 <html>
 <head>
     <title>Dashboard</title>
-   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
 <div class="container">
 
-    <h2>Welcome {{ user.username }}</h2>
 
-    <!-- BALANCE -->
-    <p class="balance">Balance: {{ user.balance }}</p>
+<h2>Welcome {{ username }}</h2>
 
-    <!-- FLASH -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p class="flash {{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
+<!-- BALANCE -->
+<p class="balance">Balance: {{ balance }}</p>
 
-    <!-- DEPOSIT -->
-    <div class="section">
-        <input type="number" step="0.01" id="deposit_amount" placeholder="Enter amount">
-        <form method="POST" action="/deposit">
-            <input type="hidden" name="amount" id="deposit_hidden">
-            <button type="submit" onclick="setDeposit()">Deposit</button>
-        </form>
-    </div>
+<!-- FLASH -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+        <p class="flash {{ category }}">{{ message }}</p>
+    {% endfor %}
+{% endwith %}
 
-    <!-- WITHDRAW -->
-    <div class="section">
-        <input type="number" step="0.01" id="withdraw_amount" placeholder="Enter amount">
-        <form method="POST" action="/withdraw">
-            <input type="hidden" name="amount" id="withdraw_hidden">
-            <button type="submit" onclick="setWithdraw()">Withdraw</button>
-        </form>
-    </div>
+<!-- DEPOSIT -->
+<div class="section">
+    <form method="POST" action="/deposit">
+        <input type="number" step="0.01" name="amount" placeholder="Enter amount" required>
+        <button type="submit">Deposit</button>
+    </form>
+</div>
 
-    <!-- TRANSFER -->
-    <div class="section">
-        <input type="text" id="receiver" placeholder="Receiver username">
-        <input type="number" step="0.01" id="transfer_amount" placeholder="Enter amount">
+<!-- WITHDRAW -->
+<div class="section">
+    <form method="POST" action="/withdraw">
+        <input type="number" step="0.01" name="amount" placeholder="Enter amount" required>
+        <button type="submit">Withdraw</button>
+    </form>
+</div>
 
-        <form method="POST" action="/transfer">
-            <input type="hidden" name="receiver" id="receiver_hidden">
-            <input type="hidden" name="amount" id="transfer_hidden">
-            <button type="submit" onclick="setTransfer()">Send Money</button>
-        </form>
-    </div>
+<!-- TRANSFER -->
+<div class="section">
+    <form method="POST" action="/transfer">
+        <input type="text" name="receiver" placeholder="Receiver username" required>
+        <input type="number" step="0.01" name="amount" placeholder="Enter amount" required>
+        <button type="submit">Send Money</button>
+    </form>
+</div>
 
-    <!-- BOTTOM ACTIONS -->
-    <div class="bottom">
-        <a href="/logout" class="logout">Logout</a>
-        <button class="history-btn" onclick="toggleHistory()">View History</button>
-    </div>
 
-    <!-- HISTORY -->
-    <div id="history" class="history-box">
-        {% if user.history %}
-            {% for h in user.history %}
-                <p>{{ h }}</p>
-            {% endfor %}
-        {% else %}
-            <p>No transactions yet</p>
-        {% endif %}
-    </div>
+<!-- BOTTOM -->
+
+<div class="bottom">
+    <a href="/logout" class="logout">Logout</a>
+    <button class="history-btn" onclick="toggleHistory()">View History</button>
+</div>
+
+<!-- HISTORY -->
+
+<div id="history" class="history-box" style="display:none;">
+
+
+{% if transactions %}
+    {% for t in transactions %}
+        <p>
+            [{{ t[4] }}] 
+            {{ t[3] | capitalize }}: 
+            {{ t[0] }} → {{ t[1] }} 
+            ({{ t[2] }})
+        </p>
+    {% endfor %}
+{% else %}
+    <p>No transactions yet</p>
+{% endif %}
+```
 
 </div>
 
 <script>
-function setDeposit() {
-    document.getElementById("deposit_hidden").value =
-        document.getElementById("deposit_amount").value;
-}
-
-function setWithdraw() {
-    document.getElementById("withdraw_hidden").value =
-        document.getElementById("withdraw_amount").value;
-}
-
-function setTransfer() {
-    document.getElementById("receiver_hidden").value =
-        document.getElementById("receiver").value;
-
-    document.getElementById("transfer_hidden").value =
-        document.getElementById("transfer_amount").value;
-}
-
 function toggleHistory() {
     var box = document.getElementById("history");
     box.style.display = box.style.display === "block" ? "none" : "block";
 }
 </script>
+
+
+
+</div>
 
 </body>
 </html>

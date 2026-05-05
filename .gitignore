@@ -1,4 +1,4 @@
-bank.json
-bank.txt
 __pycache__/
 *.pyc
+bank.db
+.env
